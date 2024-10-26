@@ -52,6 +52,26 @@ const TableroList = () => {
     setIsUpdateModalOpen(false);
   };
 
+  const deleteTablero = async (id: number) => {
+    const confirmDelete = window.confirm('¿Estás seguro de que deseas eliminar este tablero?');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/tablero/delete/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar el tablero');
+      }
+
+      // Actualizar el estado después de eliminar
+      setTableros((prevTableros) => prevTableros.filter((tablero) => tablero.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    }
+  };
+
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
@@ -89,6 +109,12 @@ const TableroList = () => {
               >
                 Editar
               </button>
+              <button 
+                      onClick={() => deleteTablero(tablero.id)} 
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Eliminar
+                    </button>
             </td>
           </tr>
           ))}
