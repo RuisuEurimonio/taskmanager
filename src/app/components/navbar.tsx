@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -14,8 +16,8 @@ const Navbar = () => {
         <Link href="/" className="text-white text-lg font-semibold hover:text-gray-400">
           Inicio
         </Link>
-        <Link href="/proyectos" className="text-white text-lg font-semibold hover:text-gray-400">
-          Proyectos
+        <Link href="/tableros" className="text-white text-lg font-semibold hover:text-gray-400">
+          Tableros
         </Link>
         <Link href="/usuarios" className="text-white text-lg font-semibold hover:text-gray-400">
           Usuarios
