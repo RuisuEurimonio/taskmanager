@@ -37,7 +37,7 @@ const UserView = () => {
     rol: { id: 1, name: 'Admin', description: 'Administrador del sistema' } // Valor inicial
   });
   const [editUsuario, setEditUsuario] = useState<Usuario | null>(null);
-  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
+  const [validationErrors] = useState<{ [key: string]: string }>({});
 
   const getUser = () => {
     const user = localStorage.getItem('user');

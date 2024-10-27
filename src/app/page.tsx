@@ -11,31 +11,6 @@ interface Task {
 }
 
 export default function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTaskTitle, setNewTaskTitle] = useState<string>('');
-
-  const addTask = () => {
-    if (newTaskTitle.trim() === '') return;
-
-    const newTask: Task = {
-      id: tasks.length + 1,
-      title: newTaskTitle,
-      completed: false,
-    };
-
-    setTasks([...tasks, newTask]);
-    setNewTaskTitle('');
-  };
-
-  const toggleTaskCompletion = (taskId: number) => {
-    setTasks(tasks.map(task =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
-  };
-
-  const deleteTask = (taskId: number) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
-  };
 
   return (
     <>
