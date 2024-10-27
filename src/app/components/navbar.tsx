@@ -1,27 +1,13 @@
 "use client"
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-export interface Role {
-  id: number;
-  name: string;
-  description: string;
-}
-
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  password: string; // Aunque es recomendable no guardar la contraseña en el localStorage.
-  rol: Role;
-}
+import { User } from '../types/types';
 
 const Navbar = () => {
 
-  const user = localStorage.getItem('user');
-  const parsedUser : User | null = user ? JSON.parse(user) : null;
+  const [userE, setUserE] = useState<User|null>(null);
 
   const router = useRouter();
 
@@ -33,6 +19,12 @@ const Navbar = () => {
     clearLocalStorage(); // Limpiar el local storage
     router.push('/login'); // Redirigir a la página de inicio de sesión
   };
+
+  useEffect(()=>{
+    const user = localStorage.getItem('user');
+    const parsedUser : User | null = user ? JSON.parse(user) : null;
+    setUserE(parsedUser);
+  },[])
 
   return (
     <nav className="bg-gray-800 p-4 flex justify-between items-center shadow-md">
@@ -48,7 +40,7 @@ const Navbar = () => {
         </Link>
       </div>
       <div>
-        {parsedUser ?
+        {userE ?
               <button className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200"
                 onClick={(handleLogout)}
               >

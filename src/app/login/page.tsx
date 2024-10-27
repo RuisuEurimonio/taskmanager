@@ -1,10 +1,11 @@
 // src/app/login/page.tsx
 
-"use client"; // Asegúrate de usar "use client" para el cliente
+"use client"; 
 
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation'; // Cambia la importación de useRouter
+import Link from 'next/link';
 
 const loginSchema = z.object({
   email: z.string().email('El correo electrónico no es válido'),
@@ -104,6 +105,7 @@ const Login = () => {
             >
               {loading ? 'Cargando...' : 'Iniciar Sesión'}
             </button>
+          <Link href="/register"> Registrarse. </Link>
           </div>
         </form>
       </div>
