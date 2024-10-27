@@ -1,3 +1,4 @@
+import ColorsTable from "../components/colorsTable";
 import TableBoard from "../components/tableBoard";
 import EtiquetaTable from "../components/tableLabel";
 import TablePriority from "../components/tablePriority";
@@ -17,7 +18,7 @@ const GridLayout = () => {
 
       {/* Tercer componente (para futuras expansiones) */}
       <div className="col-span-1 bg-gray-800 p-4 rounded shadow-lg text-gray-300">
-        <TableBoard />
+        <ColorsTable />
       </div>
     </div>
   );
