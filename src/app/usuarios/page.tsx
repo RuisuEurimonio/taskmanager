@@ -141,7 +141,7 @@ const UserView = () => {
   return (
     <div className="m-auto w-11/12 p-6">
       <h1 className="text-2xl font-bold mb-4">Lista de usuarios.</h1>
-      {userE ? (
+      {userE?.rol.id === 3 ? (
         <>
           <p className="text-gray-300 mb-6">Aquí puedes ver la lista de usuarios registrados en el sistema.</p>
           {loading ? (
@@ -239,7 +239,7 @@ const UserView = () => {
           )}
         </>
       ) : (
-        <p className="text-red-500">Por favor, inicia sesión para ver esta página.</p>
+        <p className="text-red-500"> No tienes los permisos necesarios.</p>
       )}
     </div>
   );

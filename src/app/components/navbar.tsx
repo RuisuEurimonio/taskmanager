@@ -7,24 +7,34 @@ import { User } from '../types/types';
 
 const Navbar = () => {
 
-  const [userE, setUserE] = useState<User|null>(null);
-
+  const [userE, setUserE] = useState<boolean>(false);
   const router = useRouter();
+  
+  useEffect(() => {
+    const checkUser = () => {
+      const storedUser = localStorage.getItem("user");
+      setUserE(!!storedUser); // Verifica si hay un usuario autenticado
+    };
 
-  const clearLocalStorage = () => {
-    localStorage.clear();
-  }
+    checkUser(); // Verifica al montar el componente
+
+    // Escucha el evento "userUpdated" para actualizar el estado
+    window.addEventListener("userUpdated", checkUser);
+
+    // Limpia el listener cuando se desmonta el componente
+    return () => {
+      window.removeEventListener("userUpdated", checkUser);
+    };
+  }, []);
 
   const handleLogout = () => {
-    clearLocalStorage(); // Limpiar el local storage
-    router.push('/login'); // Redirigir a la página de inicio de sesión
+
+    localStorage.removeItem("user");
+    setUserE(false);
+    window.dispatchEvent(new Event("userUpdated")); // Emite el evento personalizado
+    router.push("/login");
   };
 
-  useEffect(()=>{
-    const user = localStorage.getItem('user');
-    const parsedUser : User | null = user ? JSON.parse(user) : null;
-    setUserE(parsedUser);
-  },[])
 
   return (
     <nav className="bg-gray-800 p-4 flex justify-between items-center shadow-md">
@@ -41,13 +51,14 @@ const Navbar = () => {
       </div>
       <div>
         {userE ?
-              <button className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200"
+              <button key={userE ? "si" : "no"} className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200"
                 onClick={(handleLogout)}
               >
                 Cerrar sesión.
               </button>
           :
           <Link href="/login"
+            key={userE ? "si" : "no"}
             className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200"
           >
             Iniciar sesión

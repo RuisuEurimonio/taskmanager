@@ -50,6 +50,7 @@ const Login = () => {
 
       // Guardar información del usuario en local storage
       localStorage.setItem('user', JSON.stringify(userData));
+      window.dispatchEvent(new Event("userUpdated"));
 
       // Redirigir al usuario a la página de inicio después de iniciar sesión
       router.push('/'); // Cambia a la ruta de tu Home
