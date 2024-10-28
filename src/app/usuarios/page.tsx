@@ -16,9 +16,12 @@ const UsuarioSchema = z.object({
   id: z.number(),
   name: z.string().min(1, { message: "El nombre es requerido" }),
   email: z.string().email({ message: "El email no es válido" }),
-  password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres" }),
+  password: z.string().regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/, {
+    message: "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula, un número y un carácter especial."
+  }),
   rol: RolSchema,
 });
+
 
 // Tipos de Rol y Usuario a partir de los esquemas
 type Rol = z.infer<typeof RolSchema>;

@@ -7,7 +7,9 @@ import { useRouter } from 'next/navigation'; // Cambia la importación de useRou
 const registerSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   email: z.string().email('El correo electrónico no es válido'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  password: z.string().regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/, {
+    message: "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula, un número y un carácter especial."
+  })
 });
 
 const Register: React.FC = () => {
