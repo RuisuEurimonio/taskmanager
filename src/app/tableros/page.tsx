@@ -133,7 +133,7 @@ const TableroList = () => {
         
       </div>
       :
-      <div className="min-h-[90vh]">
+      <div className="min-h-[90vh] text-red-500">
         <h2> No tienes los permisos necesarios. </h2>
       </div>
       }
