@@ -196,7 +196,7 @@ const UserView = () => {
                       }
                     }
                   }}
-                  className="mr-2 p-2 border border-gray-600"
+                  className="mr-2 p-2 border border-gray-600 text-black"
                 >
                   {roles.map((role) => (
                     <option key={role.id} value={role.id}>

@@ -19,8 +19,8 @@ export default function Home() {
     </div>
 
     <div className="container mx-auto mt-8">
-        <h1 className="text-3xl font-bold text-gray-900">Bienvenido al Administrador de Tareas</h1>
-        <p className="mt-4 text-lg text-gray-700">
+        <h1 className="text-3xl font-bold text-white">Bienvenido al Administrador de Tareas</h1>
+        <p className="mt-4 text-lg text-white">
           Aquí puedes gestionar tus tareas y proyectos de manera eficiente. A continuación, encontrarás un resumen de tus actividades.
         </p>
 

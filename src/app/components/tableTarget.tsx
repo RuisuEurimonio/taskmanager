@@ -30,7 +30,7 @@ interface Card {
     description?: string;
   };
   prioridad: {
-    id: number,
+    id: number;
     name?: string;
   };
 }
@@ -53,13 +53,13 @@ export default function Home() {
     fechaCreacion: new Date().toISOString(),
     fechaVencimiento: '',
     estado: { id: 1, description: 'La tarea se ha creado recientemente' },
-    prioridad: { id: 1 }, // Agregando prioridad por defecto
+    prioridad: { id: 1 },
   });
-
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [priorities, setPriorities] = useState<Priority[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -85,7 +85,7 @@ export default function Home() {
 
     const fetchPriorities = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/prioridad/all'); // Asegúrate de que esta ruta sea correcta
+        const response = await fetch('http://localhost:8080/api/prioridad/all');
         const data = await response.json();
         setPriorities(data);
       } catch (err) {
@@ -98,29 +98,33 @@ export default function Home() {
     fetchPriorities();
   }, []);
 
-  const addCard = async () => {
+  const addOrUpdateCard = async () => {
     try {
       setValidationErrors([]);
-      cardSchema.parse(newCard); // Validación con Zod
+      cardSchema.parse(newCard);
 
-      const response = await fetch('http://localhost:8080/api/tarjeta/create', {
-        method: 'POST',
+      const url = isEditing
+        ? `http://localhost:8080/api/tarjeta/update`
+        : 'http://localhost:8080/api/tarjeta/create';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newCard),
       });
 
-      if (!response.ok) throw new Error('Error al crear la tarjeta');
+      if (!response.ok) throw new Error('Error al guardar la tarjeta');
 
-      const createdCard = await response.json();
-      setCards([...cards, createdCard]);
-      setNewCard({
-        titulo: '',
-        description: '',
-        fechaCreacion: new Date().toISOString(),
-        fechaVencimiento: '',
-        estado: { id: 1, description: 'La tarea se ha creado recientemente' },
-        prioridad: { id: 1 }, // Reset de prioridad
-      }); // Reset form
+      const savedCard = await response.json();
+
+      if (isEditing) {
+        setCards(cards.map(card => (card.id === savedCard.id ? savedCard : card)));
+      } else {
+        setCards([...cards, savedCard]);
+      }
+
+      resetForm();
     } catch (err) {
       if (err instanceof z.ZodError) {
         setValidationErrors(err.errors.map(e => e.message));
@@ -144,11 +148,29 @@ export default function Home() {
     }
   };
 
+  const editCard = (card: Card) => {
+    setNewCard(card);
+    setIsEditing(true);
+  };
+
+  const resetForm = () => {
+    setNewCard({
+      titulo: '',
+      description: '',
+      fechaCreacion: new Date().toISOString(),
+      fechaVencimiento: '',
+      estado: { id: 1, description: 'La tarea se ha creado recientemente' },
+      prioridad: { id: 1 },
+    });
+    setIsEditing(false);
+    setValidationErrors([]);
+  };
+
   return (
     <>
       <div className="container mx-auto mt-8">
-        <h1 className="text-3xl font-bold text-gray-900">Bienvenido al Administrador de Tareas</h1>
-        <p className="mt-4 text-lg text-gray-700">
+        <h1 className="text-3xl font-bold text-white">Bienvenido al Administrador de Tareas</h1>
+        <p className="mt-4 text-lg text-white">
           Aquí puedes gestionar tus tareas y proyectos de manera eficiente. A continuación, encontrarás un resumen de tus actividades.
         </p>
 
@@ -162,7 +184,7 @@ export default function Home() {
           </ul>
         )}
 
-        {/* Form para añadir nuevas tarjetas */}
+        {/* Form para añadir o actualizar tarjetas */}
         <div className="mb-4">
           <input
             type="text"
@@ -187,7 +209,7 @@ export default function Home() {
           <select
             value={newCard.estado.id}
             onChange={(e) => setNewCard({ ...newCard, estado: { ...newCard.estado, id: Number(e.target.value) } })}
-            className="ml-2 p-2 border border-gray-600 rounded"
+            className="ml-2 p-2 border border-gray-600 rounded text-black"
           >
             {statuses.map(status => (
               <option key={status.id} value={status.id}>{status.name}</option>
@@ -196,13 +218,20 @@ export default function Home() {
           <select
             value={newCard.prioridad.id}
             onChange={(e) => setNewCard({ ...newCard, prioridad: { id: Number(e.target.value) } })}
-            className="ml-2 p-2 border border-gray-600 rounded"
+            className="ml-2 p-2 border border-gray-600 rounded text-black"
           >
             {priorities.map(priority => (
               <option key={priority.id} value={priority.id}>{priority.name}</option>
             ))}
           </select>
-          <button onClick={addCard} className="ml-2 bg-green-500 text-white py-1 px-3 rounded">Añadir Tarjeta</button>
+          <button onClick={addOrUpdateCard} className="ml-2 bg-green-500 text-white py-1 px-3 rounded">
+            {isEditing ? 'Actualizar Tarjeta' : 'Añadir Tarjeta'}
+          </button>
+          {isEditing && (
+            <button onClick={resetForm} className="ml-2 bg-gray-500 text-white py-1 px-3 rounded">
+              Cancelar Edición
+            </button>
+          )}
         </div>
 
         {/* Tabla de tarjetas */}
@@ -221,19 +250,22 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {cards.map(card => (
-              <tr key={card.id} className="border-b hover:bg-gray-950">
+            {cards.map((card) => (
+              <tr key={card.id} className="text-center">
                 <td className="border border-gray-300 px-4 py-2">{card.id}</td>
                 <td className="border border-gray-300 px-4 py-2">{card.titulo}</td>
                 <td className="border border-gray-300 px-4 py-2">{card.description}</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {card.fechaCreacion ? new Date(card.fechaCreacion).toLocaleString() : 'Fecha no disponible'}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">{new Date(card.fechaVencimiento).toLocaleString()}</td>
+                <td className="border border-gray-300 px-4 py-2">{card.fechaCreacion}</td>
+                <td className="border border-gray-300 px-4 py-2">{card.fechaVencimiento}</td>
                 <td className="border border-gray-300 px-4 py-2">{card.estado.description}</td>
                 <td className="border border-gray-300 px-4 py-2">{card.prioridad.name}</td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <button onClick={() => deleteCard(card.id!)} className="bg-red-500 text-white py-1 px-3 rounded">Eliminar</button>
+                  <button onClick={() => editCard(card)} className="bg-blue-500 text-white py-1 px-2 rounded">
+                    Editar
+                  </button>
+                  <button onClick={() => deleteCard(card.id!)} className="ml-2 bg-red-500 text-white py-1 px-2 rounded">
+                    Eliminar
+                  </button>
                 </td>
               </tr>
             ))}
